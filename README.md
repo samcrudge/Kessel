@@ -8,10 +8,10 @@ Generates federated sign-in URLs for the AWS Management Console.
 Supports multiple AWS profiles.
 Built with Cobra for a powerful and user-friendly CLI experience.
 
-Prerequisites
-Go 1.16 or later
-AWS CLI configured with your profiles
-AWS SSO configured in your AWS account
+## Prerequisites
+- Go 1.16 or later
+- AWS CLI configured with your profiles
+- AWS SSO configured in your AWS account
 
 ## Installation
 Clone the repository:
