@@ -1,4 +1,5 @@
 # Kessel
+![Kessel Logo](./img/kessel.webp)
 
 ## Prerequisites
 - Go 1.16 or later
