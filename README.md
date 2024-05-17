@@ -1,4 +1,3 @@
-<h1 align="center">Kessel</h1>
 <p align="center">
   <img src="./img/kessel.png" alt="Kessel Logo" />
 </p>
