@@ -48,23 +48,27 @@ var validateCmd = &cobra.Command{
 		}
 		missingKeys := make(map[string][]string)
 
-		for _, sections := range credFile.Sections() {
-			sectionName := sections.Name()
+		for _, section := range credFile.Sections() {
+			sectionName := section.Name()
 			if sectionName != ini.DefaultSection && sectionName != "default" {
 				if strings.HasPrefix(sectionName, "profile") {
-					profileName := strings.TrimPrefix(sectionName, "profile ")
-					profiles = append(profiles, profileName)
-				} else {
-					profiles = append(profiles, sectionName)
+					sectionName = strings.TrimPrefix(sectionName, "profile ")
 				}
 
+				HasMissingKeys := false
 				for _, key := range requiredKeys {
-					if !sections.HasKey(key) {
+					if !section.HasKey(key) {
 						missingKeys[sectionName] = append(missingKeys[sectionName], key)
+						HasMissingKeys = true
 					}
+				}
+
+				if !HasMissingKeys {
+					profiles = append(profiles, sectionName)
 				}
 			}
 		}
+
 		if len(profiles) == 0 {
 			fmt.Printf("%sFailed to find profiles%s\n", ColorRed, ColorReset)
 		} else {
