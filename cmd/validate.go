@@ -6,71 +6,26 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/user"
-	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/ini.v1"
-)
-
-const (
-	ColorReset = "\033[0m"
-	ColorRed   = "\033[31m"
-	ColorGreen = "\033[32m"
 )
 
 // validateCmd represents the init command
+
 var validateCmd = &cobra.Command{
 	Use:   "validate",
-	Short: "validate AWS profiles",
+	Short: "Validate AWS profiles",
 	Long:  `This command validates your AWS local config to ensure that the tool will function as intended.`,
+
 	Run: func(cmd *cobra.Command, args []string) {
-		usr, err := user.Current()
+		profiles, missingKeys, err := validateProfiles()
 		if err != nil {
-			fmt.Printf("%sFailed to get current user: %v%s\n", ColorRed, err, ColorReset)
+			fmt.Printf("%s%s%s\n", ColorRed, err, ColorReset)
 			os.Exit(1)
-		}
-		credFilePath := filepath.Join(usr.HomeDir, ".aws", "config")
-		credFile, err := ini.Load(credFilePath)
-		if err != nil {
-			fmt.Printf("%sFailed to read file: %v%s\n", ColorRed, err, ColorReset)
-			os.Exit(1)
-		}
-
-		var profiles []string
-		requiredKeys := []string{
-			"sso_account_id",
-			"sso_start_url",
-			"sso_region",
-			"sso_role_name",
-			"region",
-		}
-		missingKeys := make(map[string][]string)
-
-		for _, section := range credFile.Sections() {
-			sectionName := section.Name()
-			if sectionName != ini.DefaultSection && sectionName != "default" {
-				if strings.HasPrefix(sectionName, "profile") {
-					sectionName = strings.TrimPrefix(sectionName, "profile ")
-				}
-
-				HasMissingKeys := false
-				for _, key := range requiredKeys {
-					if !section.HasKey(key) {
-						missingKeys[sectionName] = append(missingKeys[sectionName], key)
-						HasMissingKeys = true
-					}
-				}
-
-				if !HasMissingKeys {
-					profiles = append(profiles, sectionName)
-				}
-			}
 		}
 
 		if len(profiles) == 0 {
-			fmt.Printf("%sFailed to find profiles%s\n", ColorRed, ColorReset)
+			fmt.Printf("%sFailed to find valid profiles%s\n", ColorRed, ColorReset)
 		} else {
 			fmt.Printf("%sValid configuration for %d profiles:%s\n", ColorGreen, len(profiles), ColorReset)
 			for _, profile := range profiles {
